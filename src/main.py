@@ -175,7 +175,7 @@ def preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type,
     else:
         orig_song_path = None
 
-    song_output_dir = os.path.join(output_dir, song_id)
+    song_output_dir = os.path.join(output_dir, '%(title)s')
     orig_song_path = convert_to_stereo(orig_song_path)
 
     display_progress('[~] Separating Vocals from Instrumental...', 0.1, is_webui, progress)
@@ -250,7 +250,7 @@ def song_cover_pipeline(song_input, voice_model, pitch_change, keep_files,
         # if youtube url
         if urlparse(song_input).scheme == 'https':
             input_type = 'yt'
-            song_id = '%(title)s' # get_youtube_video_id(song_input)
+            song_id = get_youtube_video_id(song_input)
             if song_id is None:
                 error_msg = 'Invalid YouTube url.'
                 raise_exception(error_msg, is_webui)
