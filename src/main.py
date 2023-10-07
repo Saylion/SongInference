@@ -175,7 +175,7 @@ def preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type,
     else:
         orig_song_path = None
 
-    song_output_dir = os.path.join(output_dir, '%(title)s')
+    song_output_dir = os.path.join(output_dir,song_id)
     orig_song_path = convert_to_stereo(orig_song_path)
 
     display_progress('[~] Separating Vocals from Instrumental...', 0.1, is_webui, progress)
