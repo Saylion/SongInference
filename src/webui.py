@@ -313,7 +313,8 @@ if __name__ == '__main__':
                 model_upload_button = gr.Button('Upload model', variant='primary', scale=19)
                 local_upload_output_message = gr.Text(label='Output Message', interactive=False, scale=20)
                 model_upload_button.click(upload_local_model, inputs=[zip_file, local_model_name], outputs=local_upload_output_message)
-
+    app.queue()
+    
     app.launch(
         share=args.share_enabled,
         server_name=None if not args.listen else (args.listen_host or '0.0.0.0'),
