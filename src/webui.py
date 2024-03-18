@@ -152,7 +152,15 @@ def show_hop_slider(pitch_detection_algo):
         return gr.update(visible=True)
     else:
         return gr.update(visible=False)
-
+    
+def show_backvoc_slider(use_backvoc):
+    if use_backvoc == True:
+        return gr.update(visible=True)
+    else:
+        return gr.update(visible=False)
+    
+def separate_method(sep_method):
+    return sep_method
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Generate a AI cover song in the song_output/id directory.', add_help=True)
@@ -168,7 +176,7 @@ if __name__ == '__main__':
 
     with gr.Blocks(title='AICoverGenWebUI') as app:
 
-        gr.Label('AICoverGen WebUI created with ❤️', show_label=False)
+        gr.Label('AICoverGen WebUI created with ❤️ (modded)', show_label=False)
 
         # main tab
         with gr.Tab("Generate"):
@@ -176,7 +184,7 @@ if __name__ == '__main__':
             with gr.Accordion('Main Options'):
                 with gr.Row():
                     with gr.Column():
-                        rvc_model = gr.Dropdown(voice_models, label='Voice Models', info='Models folder "AICoverGen --> rvc_models". After new models are added into this folder, click the refresh button')
+                        rvc_model = gr.Dropdown(sorted(voice_models), label='Voice Models', info='Models folder "AICoverGen --> rvc_models". After new models are added into this folder, click the refresh button')
                         ref_btn = gr.Button('Refresh Models 🔁', variant='primary')
 
                     with gr.Column() as yt_link_col:
@@ -197,7 +205,7 @@ if __name__ == '__main__':
 
             with gr.Accordion('Voice conversion options', open=False):
                 with gr.Row():
-                    index_rate = gr.Slider(0, 1, value=0.5, label='Index Rate', info="Controls how much of the AI voice's accent to keep in the vocals")
+                    index_rate = gr.Slider(0, 1, value=0.6, label='Index Rate', info="Controls how much of the AI voice's accent to keep in the vocals")
                     filter_radius = gr.Slider(0, 7, value=3, step=1, label='Filter radius', info='If >=3: apply median filtering median filtering to the harvested pitch results. Can reduce breathiness')
                     rms_mix_rate = gr.Slider(0, 1, value=0.25, label='RMS mix rate', info="Control how much to mimic the original vocal's loudness (0) or a fixed loudness (1)")
                     protect = gr.Slider(0, 0.5, value=0.33, label='Protect rate', info='Protect voiceless consonants and breath sounds. Set to 0.5 to disable.')
@@ -207,12 +215,19 @@ if __name__ == '__main__':
                         f0_method.change(show_hop_slider, inputs=f0_method, outputs=crepe_hop_length)
                 keep_files = gr.Checkbox(label='Keep intermediate files', info='Keep all audio files generated in the song_output/id directory, e.g. Isolated Vocals/Instrumentals. Leave unchecked to save space')
 
+            with gr.Accordion('Vocal separation options', open=False):
+                sep_method = gr.Dropdown(['UVR-MDXNET', 'Demucs'], value='', label='Vocal separate algorithm', info='UVR-MDXNET (better vocal separate), Demucs (better for instrument)  ___UNDER DEVELOPMENT___')
+                sep_method.change(separate_method, inputs=[sep_method], outputs=[sep_method])
+    
             with gr.Accordion('Audio mixing options', open=False):
+                using_backvoc = gr.Checkbox(label='Separate back vocal too', info='Separate back vocal to better output (checklist to separate back vocal)', value=True)
                 gr.Markdown('### Volume Change (decibels)')
                 with gr.Row():
                     main_gain = gr.Slider(-20, 20, value=0, step=1, label='Main Vocals')
                     backup_gain = gr.Slider(-20, 20, value=0, step=1, label='Backup Vocals')
-                    inst_gain = gr.Slider(-20, 20, value=0, step=1, label='Music')
+                    inst_gain = gr.Slider(-20, 20, value=0, step=1, label='Music', visible='true')
+
+                    using_backvoc.change(show_backvoc_slider, inputs=using_backvoc, outputs=backup_gain)
 
                 gr.Markdown('### Reverb Control on AI Vocals')
                 with gr.Row():
@@ -235,12 +250,12 @@ if __name__ == '__main__':
                                inputs=[song_input, rvc_model, pitch, keep_files, is_webui, main_gain, backup_gain,
                                        inst_gain, index_rate, filter_radius, rms_mix_rate, f0_method, crepe_hop_length,
                                        protect, pitch_all, reverb_rm_size, reverb_wet, reverb_dry, reverb_damping,
-                                       output_format],
+                                       output_format, using_backvoc],
                                outputs=[ai_cover])
-            clear_btn.click(lambda: [0, 0, 0, 0, 0.5, 3, 0.25, 0.33, 'rmvpe', 128, 0, 0.15, 0.2, 0.8, 0.7, 'mp3', None],
+            clear_btn.click(lambda: [0, 0, 0, 0, 0.6, 3, 0.25, 0.33, 'rmvpe', 128, 0, 0.15, 0.2, 0.8, 0.7, 'mp3', None, True, 'UVR-MDXNET'],
                             outputs=[pitch, main_gain, backup_gain, inst_gain, index_rate, filter_radius, rms_mix_rate,
                                      protect, f0_method, crepe_hop_length, pitch_all, reverb_rm_size, reverb_wet,
-                                     reverb_dry, reverb_damping, output_format, ai_cover])
+                                     reverb_dry, reverb_damping, output_format, ai_cover, using_backvoc])
 
         # Download tab
         with gr.Tab('Download model'):
