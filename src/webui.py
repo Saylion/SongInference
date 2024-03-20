@@ -24,7 +24,7 @@ def get_current_models(models_dir):
 
 def update_models_list():
     models_l = get_current_models(rvc_models_dir)
-    return gr.Dropdown.update(choices=models_l)
+    return gr.Dropdown(choices=sorted(models_l))
 
 
 def load_public_models():
@@ -132,7 +132,7 @@ def filter_models(tags, query):
             if query.lower() in model_attributes:
                 models_table.append([model['name'], model['description'], model['credit'], model['url'], model['tags']])
 
-    return gr.DataFrame.update(value=models_table)
+    return gr.DataFrame(value=models_table)
 
 
 def pub_dl_autofill(pub_models, event: gr.SelectData):
