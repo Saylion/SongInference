@@ -19,7 +19,6 @@ from pedalboard.io import AudioFile
 from pydub import AudioSegment
 
 from mdx import run_mdx
-from demucs import run_demucs
 from rvc import Config, load_hubert, get_vc, rvc_infer
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
