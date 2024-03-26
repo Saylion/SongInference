@@ -19,6 +19,7 @@ from pedalboard.io import AudioFile
 from pydub import AudioSegment
 
 from mdx import run_mdx
+from demucs import run_demucs
 from rvc import Config, load_hubert, get_vc, rvc_infer
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +27,26 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mdxnet_models_dir = os.path.join(BASE_DIR, 'mdxnet_models')
 rvc_models_dir = os.path.join(BASE_DIR, 'rvc_models')
 output_dir = os.path.join(BASE_DIR, 'song_output')
+
+class SepMethodChecker:
+    def __init__(self):
+        self.prev_sep_method = None
+
+    def check_sep_method(self, sep_method):
+        if self.prev_sep_method is None:
+            self.prev_sep_method = sep_method
+            return 'True'
+        elif self.prev_sep_method == sep_method:
+            self.prev_sep_method = sep_method
+            return 'False'
+        else:
+            self.prev_sep_method = sep_method
+            return 'True'
+
+sep_checker = SepMethodChecker()
+
+def sep_method_check(sep_method):
+    return sep_checker.check_sep_method(sep_method)
 
 
 def get_youtube_video_id(url, ignore_playlist=True):
@@ -102,28 +123,35 @@ def get_rvc_model(voice_model, is_webui):
     return os.path.join(model_dir, rvc_model_filename), os.path.join(model_dir, rvc_index_filename) if rvc_index_filename else ''
 
 
-def get_audio_paths(song_dir, using_backvoc):
+def get_audio_paths(song_dir, using_backvoc,sep_method):
     orig_song_path = None
     instrumentals_path = None
     main_vocals_dereverb_path = None
     backup_vocals_path = None
 
+    sep_method_validate = sep_method_check(sep_method)
+
     for file in os.listdir(song_dir):
-        if file.endswith('_Instrumental.wav'):
-            instrumentals_path = os.path.join(song_dir, file)
-            orig_song_path = instrumentals_path.replace('_Instrumental', '')
-
-        elif file.endswith('_Vocals_Main_DeReverb.wav') and using_backvoc == True:
-            main_vocals_dereverb_path = os.path.join(song_dir, file)
+        if sep_method_validate == 'False':
+            remove_file = os.path.join(song_dir,file)
+            os.remove(remove_file)
         
-        elif file.endswith('_Vocals_DeReverb.wav') and using_backvoc == False:
-            main_vocals_dereverb_path = os.path.join(song_dir, file)
+        elif sep_method_validate == 'True':
+            if file.endswith('_Instrumental.wav'):
+                instrumentals_path = os.path.join(song_dir, file)
+                orig_song_path = instrumentals_path.replace('_Instrumental', '')
 
-        elif file.endswith('_Vocals_Backup.wav') and using_backvoc == True:
-            backup_vocals_path = os.path.join(song_dir, file)
+            elif file.endswith('_Vocals_Main_DeReverb.wav') and using_backvoc == True:
+                main_vocals_dereverb_path = os.path.join(song_dir, file)
+        
+            elif file.endswith('_Vocals_DeReverb.wav') and using_backvoc == False:
+                main_vocals_dereverb_path = os.path.join(song_dir, file)
 
-        elif using_backvoc == False:
-            backup_vocals_path = 'without back vocal'
+            elif file.endswith('_Vocals_Backup.wav') and using_backvoc == True:
+                backup_vocals_path = os.path.join(song_dir, file)
+
+            elif using_backvoc == False:
+                backup_vocals_path = 'without back vocal'
         
         
     return orig_song_path, instrumentals_path, main_vocals_dereverb_path, backup_vocals_path
@@ -190,7 +218,7 @@ def preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type,
         vocals_path, instrumentals_path = run_mdx(mdx_model_params, song_output_dir, os.path.join(mdxnet_models_dir, 'UVR-MDX-NET-Voc_FT.onnx'), orig_song_path, denoise=True, keep_orig=keep_orig)
 
     elif sep_method == 'Demucs':
-        vocals_path, instrumentals_path = run_demucs(song_output_dir, orig_song_path)
+        vocals_path, instrumentals_path = run_demucs(song_output_dir, orig_song_path, keep_orig=keep_orig)
 
     if using_backvoc == True:
         display_progress('[~] Separating Main Vocals from Backup Vocals...', 0.2, is_webui, progress)
@@ -259,7 +287,7 @@ def song_cover_pipeline(song_input, voice_model, pitch_change, keep_files,
                         is_webui=0, main_gain=0, backup_gain=0, inst_gain=0, index_rate=0.5, filter_radius=3,
                         rms_mix_rate=0.25, f0_method='rmvpe', crepe_hop_length=128, protect=0.33, pitch_change_all=0,
                         reverb_rm_size=0.15, reverb_wet=0.2, reverb_dry=0.8, reverb_damping=0.7, output_format='mp3',
-                        progress=gr.Progress(), using_backvoc=True):
+                        progress=gr.Progress(), using_backvoc=True, sep_method='UVR-MDXNET'):
     try:
         if not song_input or not voice_model:
             raise_exception('Ensure that the song input field and voice model field is filled.', is_webui)
@@ -292,15 +320,15 @@ def song_cover_pipeline(song_input, voice_model, pitch_change, keep_files,
 
         if not os.path.exists(song_dir):
             os.makedirs(song_dir)
-            orig_song_path, vocals_path, instrumentals_path, main_vocals_path, backup_vocals_path, main_vocals_dereverb_path = preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type, progress, using_backvoc)
+            orig_song_path, vocals_path, instrumentals_path, main_vocals_path, backup_vocals_path, main_vocals_dereverb_path = preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type, progress, using_backvoc, sep_method)
 
         else:
             vocals_path, main_vocals_path = None, None
-            paths = get_audio_paths(song_dir, using_backvoc)
+            paths = get_audio_paths(song_dir, using_backvoc, sep_method)
 
             # if any of the audio files aren't available or keep intermediate files, rerun preprocess
             if any(path is None for path in paths) or keep_files:
-                orig_song_path, vocals_path, instrumentals_path, main_vocals_path, backup_vocals_path, main_vocals_dereverb_path = preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type, progress, using_backvoc)
+                orig_song_path, vocals_path, instrumentals_path, main_vocals_path, backup_vocals_path, main_vocals_dereverb_path = preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type, progress, using_backvoc, sep_method)
             else:
                 orig_song_path, instrumentals_path, main_vocals_dereverb_path, backup_vocals_path = paths
 

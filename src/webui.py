@@ -216,7 +216,7 @@ if __name__ == '__main__':
                 keep_files = gr.Checkbox(label='Keep intermediate files', info='Keep all audio files generated in the song_output/id directory, e.g. Isolated Vocals/Instrumentals. Leave unchecked to save space')
 
             with gr.Accordion('Vocal separation options', open=False):
-                sep_method = gr.Dropdown(['UVR-MDXNET', 'Demucs'], value='', label='Vocal separate algorithm', info='UVR-MDXNET (better vocal separate), Demucs (better for instrument)  ___UNDER DEVELOPMENT___')
+                sep_method = gr.Dropdown(['UVR-MDXNET', 'Demucs'], value='', label='Vocal separate algorithm', info='UVR-MDXNET (better vocal separate), Demucs (better for instrument) __NEW FEATURES__')
                 sep_method.change(separate_method, inputs=[sep_method], outputs=[sep_method])
     
             with gr.Accordion('Audio mixing options', open=False):
@@ -250,7 +250,7 @@ if __name__ == '__main__':
                                inputs=[song_input, rvc_model, pitch, keep_files, is_webui, main_gain, backup_gain,
                                        inst_gain, index_rate, filter_radius, rms_mix_rate, f0_method, crepe_hop_length,
                                        protect, pitch_all, reverb_rm_size, reverb_wet, reverb_dry, reverb_damping,
-                                       output_format, using_backvoc],
+                                       output_format, using_backvoc, sep_method],
                                outputs=[ai_cover])
             clear_btn.click(lambda: [0, 0, 0, 0, 0.6, 3, 0.25, 0.33, 'rmvpe', 128, 0, 0.15, 0.2, 0.8, 0.7, 'mp3', None, True, 'UVR-MDXNET'],
                             outputs=[pitch, main_gain, backup_gain, inst_gain, index_rate, filter_radius, rms_mix_rate,
