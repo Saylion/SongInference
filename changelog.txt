@@ -1,0 +1,26 @@
+=====> CHANGELOG <=====
+
+Patch Note (18 Maret 2024):
+
+1. Menambahkan opsi untuk memisahkan back vocal atau tidak
+   "Added option to separate back vocals or not"
+
+2. Sortir menurut abjad untuk nama Model
+   "Sort alphabetically for Model name"
+
+3. Menambahkan opsi untuk import model dari Google Drive baik manual/satu persatu atau semua model yang ada di drive/RVC
+   "Added the option to import models from Google Drive either manually/one by one or all models in Drive/RVC"
+
+4. Menambahkan opsi save to drive untuk hasil output
+   "Added save to drive option for output results"
+
+------------------------------------------------------------------------------------------------------------------------
+
+Patch Note (26 Maret 2024):
+
+1. Menambahkan fitur metode pemisahan vocal dan instrumen menggunakan Demucs/UVR-MDXNET
+   "Added vocal and instrument separation method feature using Demucs/UVR-MDXNET"
+2. Perbaikan beberapa bugs
+   "Fixed some bugs
+
+------------------------------------------------------------------------------------------------------------------------
