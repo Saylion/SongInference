@@ -35,13 +35,13 @@ class SepMethodChecker:
     def check_sep_method(self, sep_method):
         if self.prev_sep_method is None:
             self.prev_sep_method = sep_method
-            return 'True'
+            return 'Changed'
         elif self.prev_sep_method == sep_method:
             self.prev_sep_method = sep_method
-            return 'False'
+            return 'Unchanged'
         else:
             self.prev_sep_method = sep_method
-            return 'True'
+            return 'Changed'
 
 sep_checker = SepMethodChecker()
 
@@ -132,11 +132,11 @@ def get_audio_paths(song_dir, using_backvoc,sep_method):
     sep_method_validate = sep_method_check(sep_method)
 
     for file in os.listdir(song_dir):
-        if sep_method_validate == 'False':
+        if sep_method_validate == 'Changed':
             remove_file = os.path.join(song_dir,file)
             os.remove(remove_file)
         
-        elif sep_method_validate == 'True':
+        elif sep_method_validate == 'Unchanged':
             if file.endswith('_Instrumental.wav'):
                 instrumentals_path = os.path.join(song_dir, file)
                 orig_song_path = instrumentals_path.replace('_Instrumental', '')
