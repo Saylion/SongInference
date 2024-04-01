@@ -24,3 +24,10 @@ Patch Note (26 Maret 2024):
    "Fixed some bugs
 
 ------------------------------------------------------------------------------------------------------------------------
+
+Patch Note (1 April 2024):
+
+1. Menambahkan fitur Voice Conversion ke back vocal
+   "Added Voice Conversion into back vocal feature"
+2. Merubah pengaturan Pitch yang semula -3 s/d 3 menjadi -24 s/d 24 dengan sedikit penyesuaian
+   "Change the Pitch setting from -3 to 3 to -24 to 24 with a little adjustment"
