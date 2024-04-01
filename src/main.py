@@ -240,7 +240,7 @@ def preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type,
     if backvoc_infer == True:
         _, back_vocals_dereverb_path = run_mdx(mdx_model_params, song_output_dir,os.path.join(mdxnet_models_dir, 'Reverb_HQ_By_FoxJoy.onnx'), backup_vocals_path, invert_suffix='DeReverb', exclude_main=True, denoise=True)
     else:
-        _, back_vocals_dereverb_path = ''
+        _, back_vocals_dereverb_path = '',''
     return orig_song_path, vocals_path, instrumentals_path, main_vocals_path, backup_vocals_path, main_vocals_dereverb_path, back_vocals_dereverb_path
 
 
@@ -377,9 +377,11 @@ def song_cover_pipeline(song_input, voice_model, pitch_change, keep_files,
 
         if not keep_files:
             display_progress('[~] Removing intermediate audio files...', 0.95, is_webui, progress)
-            intermediate_files = [vocals_path, main_vocals_path, ai_vocals_mixed_path, ai_back_vocals_mixed_path]
+            intermediate_files = [vocals_path, main_vocals_path, ai_vocals_mixed_path]
             if pitch_change_all != 0:
                 intermediate_files += [instrumentals_path, backup_vocals_path]
+            if backvoc_infer == True:
+                intermediate_files += [ai_back_vocals_mixed_path]
             for file in intermediate_files:
                 if file and os.path.exists(file):
                     os.remove(file)
