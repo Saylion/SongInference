@@ -160,13 +160,19 @@ def show_backvoc_slider(use_backvoc):
         return gr.update(visible=False)
     
 def separate_method(sep_method):
-    return sep_method
+    # Kode untuk "skip queue" atau melompati antrian
+    pass
+
+def back_voice_models(value):
+    # Kode untuk "skip loading" atau melompati antrian
+    return value
+
 
 def show_backvocPitch_slider(backvoc_infer):
     if backvoc_infer == True:
-        return gr.update(visible=True)
+        return gr.update(visible=True), gr.update(visible=True)
     else:
-        return gr.update(visible=False)
+        return gr.update(visible=False), gr.update(visible=False)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Generate a AI cover song in the song_output/id directory.', add_help=True)
@@ -177,6 +183,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     voice_models = get_current_models(rvc_models_dir)
+
     with open(os.path.join(rvc_models_dir, 'public_models.json'), encoding='utf8') as infile:
         public_models = json.load(infile)
 
@@ -191,6 +198,8 @@ if __name__ == '__main__':
                 with gr.Row():
                     with gr.Column():
                         rvc_model = gr.Dropdown(sorted(voice_models), label='Voice Models', info='Models folder "AICoverGen --> rvc_models". After new models are added into this folder, click the refresh button')
+                        rvc_backup_model = gr.Dropdown(sorted(voice_models), label='Backup Voice Models', visible=False)
+                        rvc_backup_model.change(back_voice_models, inputs=rvc_backup_model, outputs=rvc_backup_model)
                         ref_btn = gr.Button('Refresh Models 🔁', variant='primary')
 
                     with gr.Column() as yt_link_col:
@@ -222,11 +231,11 @@ if __name__ == '__main__':
                         f0_method.change(show_hop_slider, inputs=f0_method, outputs=crepe_hop_length)
                 keep_files = gr.Checkbox(label='Keep intermediate files', info='Keep all audio files generated in the song_output/id directory, e.g. Isolated Vocals/Instrumentals. Leave unchecked to save space')
                 backvoc_infer = gr.Checkbox(label='Use RVC into backvocal', info='Do RVC Conversion into backvocal')
-                backvoc_infer.change(show_backvocPitch_slider, inputs=backvoc_infer, outputs=back_vocal_pitch)
+                backvoc_infer.change(show_backvocPitch_slider, inputs=backvoc_infer, outputs=[back_vocal_pitch, rvc_backup_model])
 
             with gr.Accordion('Vocal separation options', open=False):
                 sep_method = gr.Dropdown(['UVR-MDXNET', 'Demucs'], value='', label='Vocal separate algorithm', info='UVR-MDXNET (better vocal separate), Demucs (better for instrument) __NEW FEATURES__')
-                sep_method.change(separate_method, inputs=[sep_method], outputs=[sep_method])
+                sep_method.change(separate_method)#, inputs=[sep_method], outputs=[sep_method])
     
             with gr.Accordion('Audio mixing options', open=False):
                 using_backvoc = gr.Checkbox(label='Separate back vocal too', info='Separate back vocal to better output (checklist to separate back vocal)', value=True)
@@ -256,7 +265,7 @@ if __name__ == '__main__':
             ref_btn.click(update_models_list, None, outputs=rvc_model)
             is_webui = gr.Number(value=1, visible=False)
             generate_btn.click(song_cover_pipeline,
-                               inputs=[song_input, rvc_model, pitch, keep_files, is_webui, main_gain, backup_gain,
+                               inputs=[song_input, rvc_model, rvc_backup_model, pitch, keep_files, is_webui, main_gain, backup_gain,
                                        inst_gain, index_rate, filter_radius, rms_mix_rate, f0_method, crepe_hop_length,
                                        protect, pitch_all, reverb_rm_size, reverb_wet, reverb_dry, reverb_damping,
                                        output_format, using_backvoc, sep_method, backvoc_infer, back_vocal_pitch],
