@@ -301,6 +301,10 @@ def song_cover_pipeline(song_input, voice_model, backvoice_model, pitch_change, 
     try:
         if not song_input or not voice_model:
             raise_exception('Ensure that the song input field and voice model field is filled.', is_webui)
+        
+        if backvoc_infer == True:
+            if not backvoice_model:
+                raise_exception('Ensure that the back voice model field is filled.', is_webui)
 
         display_progress('[~] Starting AI Cover Generation Pipeline...', 0, is_webui, progress)
 
