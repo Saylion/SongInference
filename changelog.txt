@@ -36,3 +36,12 @@ Patch Note (26 April 2024):
 
 1. Sekarang anda bisa melakukan inference backvocal secara terpisah dengan model yang diinginkan
    "Now you can perform backvocal inference separately with the desired model"
+
+------------------------------------------------------------------------------------------------------------------------
+
+Patch Note (14 Juli 2024):
+
+1. Optimalisasi keluaran pada colab notebook
+   "Colab notebook output optimization"
+2. Perbaikan bug kecil
+   "Minor bug fix"
