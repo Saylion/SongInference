@@ -45,3 +45,12 @@ Patch Note (14 Juli 2024):
    "Colab notebook output optimization"
 2. Perbaikan bug kecil
    "Minor bug fix"
+
+------------------------------------------------------------------------------------------------------------------------
+
+Patch Note (28 Juli 2024):
+
+1. Optimalisasi keluaran pada colab notebook
+   "Colab notebook output optimization"
+2. Perbaikan bug kecil
+   "Minor bug fix"
