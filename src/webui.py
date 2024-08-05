@@ -8,6 +8,9 @@ from argparse import ArgumentParser
 import gradio as gr
 
 from main import song_cover_pipeline
+from copy_model_from_drive import copy_model_tab
+from themes import theme
+from footer import footer
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -187,7 +190,7 @@ if __name__ == '__main__':
     with open(os.path.join(rvc_models_dir, 'public_models.json'), encoding='utf8') as infile:
         public_models = json.load(infile)
 
-    with gr.Blocks(title='AICoverGenWebUI') as app:
+    with gr.Blocks(title='AICoverGenWebUI', theme='NoCrypt/miku', ) as app:
 
         gr.Label('AICoverGen WebUI created with ❤️ (modded)', show_label=False)
 
@@ -346,6 +349,12 @@ if __name__ == '__main__':
                 model_upload_button = gr.Button('Upload model', variant='primary', scale=19)
                 local_upload_output_message = gr.Text(label='Output Message', interactive=False, scale=20)
                 model_upload_button.click(upload_local_model, inputs=[zip_file, local_model_name], outputs=local_upload_output_message)
+        # Copy model from drive tab
+        with gr.Tab('Copy model from drive'):
+          copy_model_tab()
+
+        gr.HTML(footer)
+    
     app.queue()
 
     print("\n--------------------------------------------\n")
