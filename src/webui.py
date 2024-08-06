@@ -9,7 +9,6 @@ import gradio as gr
 
 from main import song_cover_pipeline
 from copy_model_from_drive import copy_model_tab
-from themes import theme
 from footer import footer
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
