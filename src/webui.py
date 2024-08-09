@@ -26,7 +26,7 @@ def get_current_models(models_dir):
 
 def update_models_list():
     models_l = get_current_models(rvc_models_dir)
-    return gr.Dropdown(choices=sorted(models_l))
+    return gr.Dropdown(choices=sorted(models_l)), gr.Dropdown(choices=sorted(models_l))
 
 
 def load_public_models():
@@ -174,7 +174,7 @@ def show_backvocPitch_slider(backvoc_infer):
     if backvoc_infer == True:
         return gr.update(visible=True), gr.update(visible=True)
     else:
-        return gr.update(visible=False), gr.update(visible=False)
+        return gr.update(visible=False), gr.update(visible=False, value='')
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Generate a AI cover song in the song_output/id directory.', add_help=True)
@@ -264,7 +264,7 @@ if __name__ == '__main__':
                 generate_btn = gr.Button("Generate", variant='primary')
                 ai_cover = gr.Audio(label='AI Cover', show_share_button=False)
 
-            ref_btn.click(update_models_list, None, outputs=rvc_model)
+            ref_btn.click(update_models_list, None, outputs=[rvc_model, rvc_backup_model])
             is_webui = gr.Number(value=1, visible=False)
             generate_btn.click(song_cover_pipeline,
                                inputs=[song_input, rvc_model, rvc_backup_model, pitch, keep_files, is_webui, main_gain, backup_gain,
