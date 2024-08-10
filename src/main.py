@@ -7,6 +7,7 @@ import shlex
 import subprocess
 from contextlib import suppress
 from urllib.parse import urlparse, parse_qs
+import shutil
 
 import gradio as gr
 import librosa
@@ -135,7 +136,10 @@ def get_audio_paths(song_dir, using_backvoc, sep_method, backvoc_infer):
     for file in os.listdir(song_dir):
         if sep_method_validate == 'Changed':
             remove_file = os.path.join(song_dir,file)
-            os.remove(remove_file)
+            if os.path.isfile(remove_file):
+                os.remove(remove_file)
+            elif os.path.isdir(remove_file):
+                shutil.rmtree(remove_file)
         
         elif sep_method_validate == 'Unchanged':
             if file.endswith('_Instrumental.wav'):
