@@ -28,7 +28,7 @@ We only optimized this mod version for google colab usage. Original Repository b
 - Pitch change for vocals and instrumentals together. Same effect as changing key of song in Karaoke.
 - Audio output format option: wav or mp3.
 
-##Mod Features
+### Mod Features
 - Clone your model from google drive into model directory
 - Option to choose the audio separation algorithm between UVR-MDXNET or Demucs
 - Option to use RVC model into backvocal, can use diferent RVC model at same time
