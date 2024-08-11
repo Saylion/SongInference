@@ -130,7 +130,7 @@ Once the output message says `[NAME] Model successfully uploaded!`, you should b
 
 ### Copy RVC models from Google Drive
 
-![](images\mod_ver\webui_copy_model.png?raw=true)
+![](images\webui_copy_model.png?raw=true)
 
 If you have trained RVC v2 models on google drive and would like to use them for AI Cover generations.
 Navigate to the `Copy model from drive` tab, click `Scan model` and wait for a few seconds.
