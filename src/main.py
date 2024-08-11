@@ -29,26 +29,17 @@ mdxnet_models_dir = os.path.join(BASE_DIR, 'mdxnet_models')
 rvc_models_dir = os.path.join(BASE_DIR, 'rvc_models')
 output_dir = os.path.join(BASE_DIR, 'song_output')
 
-class SepMethodChecker:
-    def __init__(self):
-        self.prev_sep_method = None
-
-    def check_sep_method(self, sep_method):
-        if self.prev_sep_method is None:
-            self.prev_sep_method = sep_method
-            return 'Changed'
-        elif self.prev_sep_method == sep_method:
-            self.prev_sep_method = sep_method
-            return 'Unchanged'
-        else:
-            self.prev_sep_method = sep_method
-            return 'Changed'
-
-sep_checker = SepMethodChecker()
-
-def sep_method_check(sep_method):
-    return sep_checker.check_sep_method(sep_method)
-
+def separate_model_change_detect(song_dir, sep_method):
+  output_folder_list = os.listdir(song_dir)
+  if not f'.create_with_{sep_method}.txt' in output_folder_list:
+    for file in output_folder_list:
+      remove_file = os.path.join(song_dir,file)
+      if os.path.isfile(remove_file):
+        os.remove(remove_file)
+      elif os.path.isdir(remove_file):
+        shutil.rmtree(remove_file)
+    with open(os.path.join(song_dir, f'.create_with_{sep_method}.txt'), 'w') as file:
+      file.write('')
 
 def get_youtube_video_id(url, ignore_playlist=True):
     """
@@ -131,38 +122,29 @@ def get_audio_paths(song_dir, using_backvoc, sep_method, backvoc_infer):
     backup_vocals_path = None
     backup_vocals_dereverb_path = None
 
-    sep_method_validate = sep_method_check(sep_method)
-
+    separate_model_change_detect(song_dir, sep_method)
     for file in os.listdir(song_dir):
-        if sep_method_validate == 'Changed':
-            remove_file = os.path.join(song_dir,file)
-            if os.path.isfile(remove_file):
-                os.remove(remove_file)
-            elif os.path.isdir(remove_file):
-                shutil.rmtree(remove_file)
-        
-        elif sep_method_validate == 'Unchanged':
-            if file.endswith('_Instrumental.wav'):
-                instrumentals_path = os.path.join(song_dir, file)
-                orig_song_path = instrumentals_path.replace('_Instrumental', '')
+        if file.endswith('_Instrumental.wav'):
+            instrumentals_path = os.path.join(song_dir, file)
+            orig_song_path = instrumentals_path.replace('_Instrumental', '')
 
-            elif file.endswith('_Vocals_Main_DeReverb.wav') and using_backvoc == True:
-                main_vocals_dereverb_path = os.path.join(song_dir, file)
+        elif file.endswith('_Vocals_Main_DeReverb.wav') and using_backvoc == True:
+            main_vocals_dereverb_path = os.path.join(song_dir, file)
             
-            if backvoc_infer == True:
-                if file.endswith('_Vocals_Backup_DeReverb.wav') and using_backvoc:
-                    backup_vocals_dereverb_path = os.path.join(song_dir, file)
-                    backup_vocals_path = ''
-            if backvoc_infer == False:
-                if file.endswith('_Vocals_Backup.wav') and using_backvoc == True:
-                    backup_vocals_path = os.path.join(song_dir, file)
-                    backup_vocals_dereverb_path = ''
+        if backvoc_infer == True:
+            if file.endswith('_Vocals_Backup_DeReverb.wav') and using_backvoc:
+                backup_vocals_dereverb_path = os.path.join(song_dir, file)
+                backup_vocals_path = ''
+        if backvoc_infer == False:
+            if file.endswith('_Vocals_Backup.wav') and using_backvoc == True:
+                backup_vocals_path = os.path.join(song_dir, file)
+                backup_vocals_dereverb_path = ''
         
-            elif file.endswith('_Vocals_DeReverb.wav') and using_backvoc == False:
-                main_vocals_dereverb_path = os.path.join(song_dir, file)
+        elif file.endswith('_Vocals_DeReverb.wav') and using_backvoc == False:
+            main_vocals_dereverb_path = os.path.join(song_dir, file)
 
-            elif using_backvoc == False:
-                backup_vocals_path = 'without back vocal'
+        elif using_backvoc == False:
+            backup_vocals_path = 'without back vocal'
         
         
     return orig_song_path, instrumentals_path, main_vocals_dereverb_path, backup_vocals_path, backup_vocals_dereverb_path
