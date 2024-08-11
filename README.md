@@ -5,7 +5,7 @@ Showcase: https://www.youtube.com/watch?v=2qZuE4WM7CM
 
 Setup Guide: https://www.youtube.com/watch?v=pdlhk4vVHQk
 
-![](images\mod_ver\webui_generate.png?raw=true)
+![](images\webui_generate.png?raw=true)
 
 We only optimized this mod version for google colab usage. Original Repository by [SociallyIneptWeeb](https://github.com/SociallyIneptWeeb/AICoverGen)
 
