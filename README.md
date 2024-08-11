@@ -33,7 +33,7 @@ We only optimized this mod version for google colab usage. Original Repository b
 - Option to choose the audio separation algorithm between UVR-MDXNET or Demucs
 - Option to use RVC model into backvocal, can use diferent RVC model at same time
 - Option to separate back vocal from main vocal or not
-- Custom theme by Siddhanta19
+- Custom theme by [Siddhanta19](https://huggingface.co/spaces/Siddhanta19/nc-nomiku)
 
 ## Update AICoverGen to latest version
 
