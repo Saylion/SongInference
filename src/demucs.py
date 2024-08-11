@@ -33,7 +33,7 @@ def run_demucs(song_output_dir, orig_song_path, keep_orig):
     filename = rename(orig_song_path)
 
     get_model = 'htdemucs'
-    print(filename)
+
     command = f'demucs --two-stems=vocals -n {get_model} --out {song_output_dir} {filename}'
 
     subprocess.run(command.split(), stdout=subprocess.PIPE)
