@@ -38,8 +38,7 @@ def separate_model_change_detect(song_dir, sep_method):
         os.remove(remove_file)
       elif os.path.isdir(remove_file):
         shutil.rmtree(remove_file)
-    with open(os.path.join(song_dir, f'.create_with_{sep_method}.txt'), 'w') as file:
-      file.write('')
+
 
 def get_youtube_video_id(url, ignore_playlist=True):
     """
@@ -209,9 +208,13 @@ def preprocess_song(song_input, mdx_model_params, song_id, is_webui, input_type,
     display_progress('[~] Separating Vocals from Instrumental...', 0.1, is_webui, progress)
     if sep_method == 'UVR-MDXNET':
         vocals_path, instrumentals_path = run_mdx(mdx_model_params, song_output_dir, os.path.join(mdxnet_models_dir, 'UVR-MDX-NET-Voc_FT.onnx'), orig_song_path, denoise=True, keep_orig=keep_orig)
+        with open(os.path.join(song_output_dir, f'.create_with_{sep_method}.txt'), 'w') as file:
+            file.write('')
 
     elif sep_method == 'Demucs':
         vocals_path, instrumentals_path = run_demucs(song_output_dir, orig_song_path, keep_orig=keep_orig)
+        with open(os.path.join(song_output_dir, f'.create_with_{sep_method}.txt'), 'w') as file:
+            file.write('')
 
     if using_backvoc == True:
         display_progress('[~] Separating Main Vocals from Backup Vocals...', 0.2, is_webui, progress)
