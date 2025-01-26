@@ -10,6 +10,13 @@ import gradio as gr
 from main import song_cover_pipeline
 from copy_model_from_drive import copy_model_tab
 from footer import footer
+import logging
+
+logging.getLogger("numba").setLevel(logging.WARNING)
+
+logging.getLogger("pydub.converter").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("matplotlib.pyplot").setLevel(logging.WARNING)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
